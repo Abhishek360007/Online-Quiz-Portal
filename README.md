@@ -67,7 +67,33 @@ src/main/resources
 
 ---
 
-## Running locally
+## Running with Docker (recommended)
+
+The only requirement is Docker. Compose starts PostgreSQL and the app together.
+
+```bash
+cp .env.example .env        # then set your own passwords in .env
+docker compose up -d --build
+```
+
+Open <http://localhost:8080> and sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` from your `.env`.
+
+| Command | What it does |
+|---------|--------------|
+| `docker compose logs -f app` | Follow the application logs |
+| `docker compose ps` | Show both containers and their health |
+| `docker compose down` | Stop everything (data is kept in the `pgdata` volume) |
+| `docker compose down -v` | Stop and **delete** all data |
+
+The image is a multi-stage build: Maven compiles the jar, then it runs on a slim Java 21 JRE as a non-root user. A health check at `/actuator/health` reports `UP` once the database connection works.
+
+### Deploying the image
+
+Any host that runs containers works (Render, Railway, Fly.io, a VPS). Point the app at a managed PostgreSQL database with these environment variables: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` and, if the platform assigns one, `PORT`. Use `/actuator/health` as the health-check path.
+
+---
+
+## Running without Docker
 
 ### 1. Requirements
 - JDK 17 or newer

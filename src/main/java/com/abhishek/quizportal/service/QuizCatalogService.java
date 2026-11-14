@@ -71,8 +71,8 @@ public class QuizCatalogService {
     }
 
     public List<Quiz> liveQuizzes(String topic, String text) {
-        return quizzes.findLive(StringUtils.hasText(topic) ? topic : null,
-                StringUtils.hasText(text) ? text.trim() : null);
+        return quizzes.findLive(StringUtils.hasText(topic) ? topic.trim() : "",
+                StringUtils.hasText(text) ? text.trim() : "");
     }
 
     public Quiz liveQuiz(Long quizId) {

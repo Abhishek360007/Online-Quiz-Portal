@@ -1,0 +1,39 @@
+# Runs the portal with its own PostgreSQL database.
+#   cp .env.example .env     # then edit the passwords
+#   docker compose up -d --build
+# App: http://localhost:8080
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: quiz_portal
+      POSTGRES_USER: ${DB_USERNAME:-quiz}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-quiz_secret}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    image: online-quiz-portal:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/quiz_portal
+      DB_USERNAME: ${DB_USERNAME:-quiz}
+      DB_PASSWORD: ${DB_PASSWORD:-quiz_secret}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@quizportal.dev}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMe@2026}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  pgdata:
