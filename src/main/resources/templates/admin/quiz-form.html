@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head(${quiz == null} ? 'New quiz' : 'Quiz settings')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page narrow stack">
+    <div>
+        <a class="small" th:href="${quiz == null} ? @{/admin/quizzes} : @{/admin/quizzes/{id}(id=${quiz.id})}">← Back</a>
+        <h1 th:text="${quiz == null} ? 'New quiz' : 'Quiz settings'">Quiz</h1>
+    </div>
+
+    <form class="panel" method="post" novalidate th:object="${form}"
+          th:action="${quiz == null} ? @{/admin/quizzes/create} : @{/admin/quizzes/{id}/settings(id=${quiz.id})}">
+
+        <div class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
+            <label for="title">Title</label>
+            <input class="input" id="title" th:field="*{title}">
+            <div class="error-text" th:errors="*{title}"></div>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('topic')} ? 'has-error'">
+            <label for="topic">Topic</label>
+            <input class="input" id="topic" th:field="*{topic}" placeholder="Java, SQL, General knowledge…">
+            <div class="error-text" th:errors="*{topic}"></div>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
+            <label for="description">Description <span class="muted small">(optional)</span></label>
+            <textarea id="description" rows="3" th:field="*{description}"></textarea>
+            <div class="error-text" th:errors="*{description}"></div>
+        </div>
+
+        <div class="split">
+            <div class="field" th:classappend="${#fields.hasErrors('timeLimitMinutes')} ? 'has-error'">
+                <label for="timeLimitMinutes">Time limit (minutes)</label>
+                <input class="input" type="number" min="1" max="240" id="timeLimitMinutes" th:field="*{timeLimitMinutes}">
+                <div class="error-text" th:errors="*{timeLimitMinutes}"></div>
+            </div>
+            <div class="field" th:classappend="${#fields.hasErrors('passMark')} ? 'has-error'">
+                <label for="passMark">Pass mark (%)</label>
+                <input class="input" type="number" min="0" max="100" id="passMark" th:field="*{passMark}">
+                <div class="error-text" th:errors="*{passMark}"></div>
+            </div>
+        </div>
+
+        <p class="hint" th:if="${quiz == null}">The quiz starts as a draft that students can't see.</p>
+        <button class="btn" type="submit" th:text="${quiz == null} ? 'Create quiz' : 'Save settings'">Save</button>
+    </form>
+</main>
+</body>
+</html>

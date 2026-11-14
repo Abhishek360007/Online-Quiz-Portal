@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('My attempts')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <h1>My attempts</h1>
+    <section class="panel flush">
+        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(attempts)}">
+            You haven't finished a quiz yet. <a th:href="@{/catalog}">Browse quizzes</a>.
+        </p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(attempts)}">
+            <table>
+                <thead><tr><th>Quiz</th><th>Topic</th><th>Score</th><th>Result</th><th>Time used</th><th>Finished</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${attempts}">
+                    <td th:text="${a.quiz.title}"></td>
+                    <td th:text="${a.quiz.topic}"></td>
+                    <td th:text="${a.correctCount} + ' / ' + ${a.questionCount}"></td>
+                    <td><span class="tag" th:classappend="${a.passed} ? 'good' : 'bad'" th:text="${a.percent} + '%'"></span></td>
+                    <td th:text="${a.durationText}"></td>
+                    <td class="nowrap" th:text="${#temporals.format(a.finishedAt, 'd MMM yyyy, HH:mm')}"></td>
+                    <td class="right"><a class="btn ghost small" th:href="@{/attempt/{id}/review(id=${a.id})}">Review</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

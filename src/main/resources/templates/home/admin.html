@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Admin home')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <th:block th:replace="~{fragments/shell :: flash}"></th:block>
+
+    <div class="spread">
+        <div>
+            <h1>Hello, <span th:text="${me.displayName}">Admin</span></h1>
+            <p class="muted">Here's how the portal is doing.</p>
+        </div>
+        <div class="row">
+            <a class="btn" th:href="@{/admin/quizzes/create}">+ New quiz</a>
+            <a class="btn ghost" th:href="@{/admin/quizzes}">All quizzes</a>
+        </div>
+    </div>
+
+    <section class="tiles">
+        <div class="tile"><div class="tile-label">Quizzes</div><div class="tile-value" th:text="${quizTotal}">0</div></div>
+        <div class="tile"><div class="tile-label">Live now</div><div class="tile-value" th:text="${liveTotal}">0</div></div>
+        <div class="tile"><div class="tile-label">Students</div><div class="tile-value" th:text="${studentTotal}">0</div></div>
+        <div class="tile"><div class="tile-label">Attempts</div><div class="tile-value" th:text="${attemptTotal}">0</div></div>
+        <div class="tile"><div class="tile-label">Avg. score</div><div class="tile-value" th:text="${average} + '%'">0%</div></div>
+    </section>
+
+    <section class="panel flush">
+        <div class="panel-title">Latest attempts</div>
+        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(activity)}">Nobody has finished a quiz yet.</p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(activity)}">
+            <table>
+                <thead><tr><th>Student</th><th>Quiz</th><th>Score</th><th>Result</th><th>Finished</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="a : ${activity}">
+                    <td th:text="${a.student.displayName}"></td>
+                    <td th:text="${a.quiz.title}"></td>
+                    <td th:text="${a.correctCount} + ' / ' + ${a.questionCount}"></td>
+                    <td><span class="tag" th:classappend="${a.passed} ? 'good' : 'bad'" th:text="${a.percent} + '%'"></span></td>
+                    <td class="nowrap" th:text="${#temporals.format(a.finishedAt, 'd MMM, HH:mm')}"></td>
+                    <td class="right"><a class="btn ghost small" th:href="@{/attempt/{id}/review(id=${a.id})}">Open</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

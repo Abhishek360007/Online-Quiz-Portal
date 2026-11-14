@@ -1,0 +1,23 @@
+# Build output
+target/
+*.class
+*.log
+
+# Maven wrapper binary (downloaded on demand)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Local tooling
+.github/modernize/
+
+# Local secrets
+.env
+application-local.properties

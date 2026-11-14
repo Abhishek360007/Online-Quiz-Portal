@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Sign up')}"></head>
+<body>
+<main class="auth">
+    <div class="auth-box">
+        <div class="auth-head">
+            <h1>Create an account</h1>
+            <p>Take quizzes, see your scores, climb the leaderboard</p>
+        </div>
+        <div class="panel">
+            <form th:action="@{/signup}" th:object="${form}" method="post" novalidate>
+                <div class="field" th:classappend="${#fields.hasErrors('displayName')} ? 'has-error'">
+                    <label for="displayName">Your name</label>
+                    <input class="input" id="displayName" th:field="*{displayName}" autocomplete="name">
+                    <div class="error-text" th:errors="*{displayName}"></div>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('email')} ? 'has-error'">
+                    <label for="email">Email</label>
+                    <input class="input" type="email" id="email" th:field="*{email}" autocomplete="email">
+                    <div class="error-text" th:errors="*{email}"></div>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('password')} ? 'has-error'">
+                    <label for="password">Password</label>
+                    <input class="input" type="password" id="password" th:field="*{password}" autocomplete="new-password">
+                    <div class="hint">8+ characters, including a number.</div>
+                    <div class="error-text" th:errors="*{password}"></div>
+                </div>
+                <div class="field" th:classappend="${#fields.hasErrors('passwordsMatch')} ? 'has-error'">
+                    <label for="repeatPassword">Repeat password</label>
+                    <input class="input" type="password" id="repeatPassword" th:field="*{repeatPassword}" autocomplete="new-password">
+                    <div class="error-text" th:errors="*{passwordsMatch}"></div>
+                </div>
+                <button class="btn wide" type="submit">Create account</button>
+            </form>
+            <p class="small muted mt">Already registered? <a th:href="@{/signin}">Sign in</a></p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

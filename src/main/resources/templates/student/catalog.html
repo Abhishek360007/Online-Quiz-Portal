@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Browse quizzes')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <th:block th:replace="~{fragments/shell :: flash}"></th:block>
+    <h1>Browse quizzes</h1>
+
+    <form class="row" method="get" th:action="@{/catalog}">
+        <input class="input" style="flex:2;min-width:200px" type="search" name="find" th:value="${find}" placeholder="Search titles and descriptions">
+        <select name="topic" style="flex:1;min-width:160px">
+            <option value="">Every topic</option>
+            <option th:each="t : ${topics}" th:value="${t}" th:text="${t}" th:selected="${t == topic}"></option>
+        </select>
+        <button class="btn ghost" type="submit">Apply</button>
+    </form>
+
+    <p class="muted" th:if="${#lists.isEmpty(quizzes)}">Nothing matches right now. Try another search.</p>
+
+    <div class="cards">
+        <article class="card" th:each="q : ${quizzes}">
+            <span class="tag" th:text="${q.topic}" style="align-self:flex-start"></span>
+            <h2 th:text="${q.title}"></h2>
+            <p class="muted small" style="margin:0" th:if="${q.description}" th:text="${q.description}"></p>
+            <div class="facts">
+                <span th:text="${#lists.size(q.questions)} + ' questions'"></span>
+                <span th:text="${q.timeLimitMinutes} + ' min'"></span>
+                <span th:text="'Pass ' + ${q.passMark} + '%'"></span>
+            </div>
+            <a class="btn" th:href="@{/catalog/{id}(id=${q.id})}">View</a>
+        </article>
+    </div>
+</main>
+</body>
+</html>

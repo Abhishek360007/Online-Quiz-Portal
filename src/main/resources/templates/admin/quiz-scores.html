@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Scores')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <div>
+        <a class="small" th:href="@{/admin/quizzes/{id}(id=${quiz.id})}">← <span th:text="${quiz.title}">Quiz</span></a>
+        <h1>Scores</h1>
+    </div>
+
+    <section class="panel flush">
+        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(attempts)}">No one has finished this quiz yet.</p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(attempts)}">
+            <table>
+                <thead><tr><th>#</th><th>Student</th><th>Score</th><th>Result</th><th>Time used</th><th>Finished</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="a, i : ${attempts}">
+                    <td th:text="${i.count}"></td>
+                    <td><span th:text="${a.student.displayName}"></span><br><span class="muted small" th:text="${a.student.email}"></span></td>
+                    <td th:text="${a.correctCount} + ' / ' + ${a.questionCount}"></td>
+                    <td>
+                        <span class="tag" th:classappend="${a.passed} ? 'good' : 'bad'" th:text="${a.percent} + '%'"></span>
+                        <span class="tag warn" th:if="${a.expired}">Out of time</span>
+                    </td>
+                    <td th:text="${a.durationText}"></td>
+                    <td class="nowrap" th:text="${#temporals.format(a.finishedAt, 'd MMM yyyy, HH:mm')}"></td>
+                    <td class="right"><a class="btn ghost small" th:href="@{/attempt/{id}/review(id=${a.id})}">Open</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

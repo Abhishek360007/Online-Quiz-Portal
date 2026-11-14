@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Sign in')}"></head>
+<body>
+<main class="auth">
+    <div class="auth-box">
+        <div class="auth-head">
+            <h1>Online Quiz Portal</h1>
+            <p>Sign in to your account</p>
+        </div>
+        <div class="panel">
+            <th:block th:replace="~{fragments/shell :: flash}"></th:block>
+            <div class="problem" th:if="${param.failed}">Wrong email or password.</div>
+            <div class="notice" th:if="${param.bye}">You've signed out.</div>
+
+            <form th:action="@{/signin}" method="post">
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input class="input" type="email" id="email" name="email" autocomplete="username" required autofocus>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input class="input" type="password" id="password" name="password" autocomplete="current-password" required>
+                </div>
+                <button class="btn wide" type="submit">Sign in</button>
+            </form>
+            <p class="small muted mt">No account yet? <a th:href="@{/signup}">Sign up as a student</a></p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

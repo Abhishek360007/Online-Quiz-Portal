@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Leaderboard')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <div>
+        <h1>Leaderboard</h1>
+        <p class="muted">Most correct answers across every quiz. Ties go to the higher average.</p>
+    </div>
+
+    <section class="panel flush">
+        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(rows)}">No finished attempts yet.</p>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(rows)}">
+            <table>
+                <thead><tr><th>#</th><th>Student</th><th>Quizzes</th><th>Correct answers</th><th>Average</th></tr></thead>
+                <tbody>
+                <tr th:each="r, i : ${rows}">
+                    <td class="rank" th:classappend="${i.count <= 3} ? 'top'" th:text="${i.count}">1</td>
+                    <td th:text="${r.name}"></td>
+                    <td th:text="${r.quizzesTaken}"></td>
+                    <td th:text="${r.correctAnswers}"></td>
+                    <td th:text="${r.roundedAverage()} + '%'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

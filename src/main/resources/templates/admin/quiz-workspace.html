@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head(${quiz.title})}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page stack">
+    <th:block th:replace="~{fragments/shell :: flash}"></th:block>
+
+    <div class="spread">
+        <div>
+            <a class="small" th:href="@{/admin/quizzes}">← All quizzes</a>
+            <h1><span th:text="${quiz.title}">Quiz</span>
+                <span class="tag" th:classappend="${quiz.live} ? 'live'" th:text="${quiz.live} ? 'Live' : 'Draft'"></span></h1>
+            <p class="muted small" th:text="${quiz.topic} + ' · ' + ${quiz.timeLimitMinutes} + ' min · pass at '
+                + ${quiz.passMark} + '% · ' + ${#lists.size(quiz.questions)} + ' questions'"></p>
+            <p th:if="${quiz.description}" th:text="${quiz.description}"></p>
+        </div>
+        <div class="row">
+            <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/toggle-live(id=${quiz.id})}">
+                <button class="btn" type="submit" th:text="${quiz.live} ? 'Move to drafts' : 'Publish'">Publish</button>
+            </form>
+            <a class="btn ghost" th:href="@{/admin/quizzes/{id}/settings(id=${quiz.id})}">Settings</a>
+            <a class="btn ghost" th:href="@{/admin/quizzes/{id}/scores(id=${quiz.id})}">Scores</a>
+            <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/delete(id=${quiz.id})}"
+                  onsubmit="return confirm('Delete this quiz along with its questions and every attempt?')">
+                <button class="btn danger" type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="panel flush">
+        <div class="panel-title spread" style="align-items:center">
+            <span>Questions</span>
+            <a class="btn small" th:href="@{/admin/quizzes/{id}/questions/create(id=${quiz.id})}">+ Add question</a>
+        </div>
+        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(quiz.questions)}">
+            No questions yet. Add one to be able to publish.
+        </p>
+        <div class="question" th:each="q, i : ${quiz.questions}">
+            <div class="question-head">
+                <div><span class="question-num" th:text="${i.count} + '.'"></span><span th:text="${q.prompt}"></span></div>
+                <div class="nowrap">
+                    <a class="btn ghost small" th:href="@{/admin/questions/{id}(id=${q.id})}">Edit</a>
+                    <form class="inline" method="post" th:action="@{/admin/questions/{id}/delete(id=${q.id})}"
+                          onsubmit="return confirm('Remove this question?')">
+                        <button class="btn danger small" type="submit">Remove</button>
+                    </form>
+                </div>
+            </div>
+            <ul class="choices">
+                <li th:each="c, ci : ${q.choices}" th:classappend="${ci.index == q.answerIndex} ? 'right-answer'">
+                    <span th:text="${c}"></span><strong th:if="${ci.index == q.answerIndex}"> ✓</strong>
+                </li>
+            </ul>
+            <p class="why" th:if="${q.explanation}" th:text="${q.explanation}"></p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head(${quiz.title})}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page narrow stack">
+    <a class="small" th:href="@{/catalog}">← Browse quizzes</a>
+    <section class="panel stack">
+        <div>
+            <span class="tag" th:text="${quiz.topic}"></span>
+            <h1 class="mt" th:text="${quiz.title}">Quiz</h1>
+            <p th:if="${quiz.description}" th:text="${quiz.description}"></p>
+        </div>
+        <ul>
+            <li><strong th:text="${#lists.size(quiz.questions)}"></strong> multiple-choice questions</li>
+            <li><strong th:text="${quiz.timeLimitMinutes} + ' minutes'"></strong> once you start — the clock keeps running if you leave</li>
+            <li>You need <strong th:text="${quiz.passMark} + '%'"></strong> to pass</li>
+            <li>When time is up your answers are submitted automatically</li>
+        </ul>
+        <form method="post" th:action="@{/catalog/{id}/begin(id=${quiz.id})}">
+            <button class="btn" type="submit">Start the quiz</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

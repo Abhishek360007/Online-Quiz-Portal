@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · Online Quiz Portal'">Online Quiz Portal</title>
+    <link rel="stylesheet" th:href="@{/assets/app.css}">
+</head>
+
+<body>
+
+<header th:fragment="topbar" class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" th:href="@{/home}"><span class="brand-mark">Q</span> Online Quiz Portal</a>
+        <nav class="nav" th:if="${me != null}">
+            <a th:href="@{/home}">Home</a>
+            <th:block th:if="${me.admin}">
+                <a th:href="@{/admin/quizzes}">Quizzes</a>
+            </th:block>
+            <th:block th:unless="${me.admin}">
+                <a th:href="@{/catalog}">Browse</a>
+                <a th:href="@{/my/attempts}">My attempts</a>
+            </th:block>
+            <a th:href="@{/leaderboard}">Leaderboard</a>
+        </nav>
+        <div class="who" th:if="${me != null}">
+            <span th:text="${me.displayName}">Name</span>
+            <span class="tag" th:text="${me.admin} ? 'Admin' : 'Student'">Role</span>
+            <form th:action="@{/signout}" method="post">
+                <button class="btn light small" type="submit">Sign out</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<th:block th:fragment="flash">
+    <div class="notice" th:if="${notice}" th:text="${notice}"></div>
+    <div class="problem" th:if="${problem}" th:text="${problem}"></div>
+</th:block>
+
+</body>
+</html>

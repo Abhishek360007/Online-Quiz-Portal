@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Your result')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+<main class="page narrow stack">
+
+    <section class="panel score-hero">
+        <p class="muted small" style="margin:0" th:if="${me.admin}" th:text="${attempt.student.displayName} + '\'s attempt'"></p>
+        <h1 th:text="${attempt.quiz.title}">Quiz</h1>
+        <div class="score-ring" th:classappend="${attempt.passed} ? 'passed'" th:text="${attempt.percent} + '%'">0%</div>
+        <p style="margin:0">
+            <strong th:text="${attempt.correctCount}"></strong> of <strong th:text="${attempt.questionCount}"></strong> correct
+            · <span th:text="${attempt.durationText}"></span>
+        </p>
+        <p class="mt">
+            <span class="tag good" th:if="${attempt.passed}">Passed</span>
+            <span class="tag bad" th:unless="${attempt.passed}" th:text="'Below the ' + ${attempt.quiz.passMark} + '% pass mark'"></span>
+        </p>
+        <div class="problem" th:if="${attempt.expired}">
+            Your answers arrived after the time limit, so they weren't counted.
+        </div>
+    </section>
+
+    <section class="panel flush">
+        <div class="panel-title">Answers</div>
+        <div class="question" th:each="q, i : ${attempt.quiz.questions}"
+             th:with="ans=${attempt.answerFor(q).orElse(null)}, picked=${ans != null ? ans.chosenIndex : null}">
+            <div class="question-head">
+                <div><span class="question-num" th:text="${i.count} + '.'"></span><span th:text="${q.prompt}"></span></div>
+                <span class="tag good" th:if="${ans != null and ans.correct}">Correct</span>
+                <span class="tag bad" th:if="${ans != null and !ans.correct and !ans.skipped}">Wrong</span>
+                <span class="tag" th:if="${ans == null or ans.skipped}">Skipped</span>
+            </div>
+            <ul class="choices">
+                <li th:each="c, ci : ${q.choices}"
+                    th:classappend="${ci.index == q.answerIndex} ? 'right-answer' : (${picked != null and ci.index == picked} ? 'wrong-answer' : '')">
+                    <span th:text="${c}"></span>
+                    <span class="muted small" th:if="${picked != null and ci.index == picked}"> — your answer</span>
+                </li>
+            </ul>
+            <p class="why" th:if="${q.explanation}" th:text="${q.explanation}"></p>
+        </div>
+    </section>
+
+    <div class="row">
+        <th:block th:unless="${me.admin}">
+            <a class="btn" th:href="@{/catalog}">Another quiz</a>
+            <a class="btn ghost" th:href="@{/my/attempts}">All my attempts</a>
+        </th:block>
+        <a class="btn ghost" th:if="${me.admin}" th:href="@{/admin/quizzes/{id}/scores(id=${attempt.quiz.id})}">Back to scores</a>
+    </div>
+</main>
+</body>
+</html>
