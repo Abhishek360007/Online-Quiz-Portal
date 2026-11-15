@@ -1,8 +1,20 @@
 # Online Quiz Portal
 
-A web app for running timed multiple-choice quizzes. Admins build and publish quizzes; students sit them against the clock, get scored instantly, review every answer, and compete on a leaderboard.
+**Production-ready quiz platform:** role-based auth (Spring Security + BCrypt), server-enforced timers, auto-grading with explained corrections, Dockerised and deployed on Render + Neon Postgres. 43 automated tests.
 
-Built with **Spring Boot 4**, **Spring Security**, **Thymeleaf** and **PostgreSQL**.
+![Java](https://img.shields.io/badge/Java-17%2B-c8552b)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-2f7a4f)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-1f3047)
+![Docker](https://img.shields.io/badge/Docker-ready-1f3047)
+![Tests](https://img.shields.io/badge/tests-43%20passing-2f7a4f)
+
+| | |
+|---|---|
+| **Auth & roles** | Spring Security sessions, BCrypt-hashed passwords, separate `ADMIN` and `STUDENT` areas, CSRF on every form |
+| **Fair timing** | The deadline lives on the server; the browser clock only auto-submits. Late answers are rejected |
+| **Auto-grading** | Instant score, pass/fail, and a correction for every wrong answer: your pick, the right one and why |
+| **Deployment** | Multi-stage Docker image with a class-data-sharing archive for fast cold starts, running on Render's free tier with Neon serverless Postgres |
+| **Quality** | 43 unit, integration and page-rendering tests; PostgreSQL-specific bugs caught by end-to-end checks against a real database |
 
 **Live demo:** <https://online-quiz-portal-jxsr.onrender.com>
 (free hosting: if nobody has visited for a while, the first page load takes about 2 minutes while the server wakes up)
