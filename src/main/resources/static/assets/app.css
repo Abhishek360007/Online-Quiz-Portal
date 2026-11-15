@@ -215,6 +215,7 @@ a.chip:hover { background: hsl(var(--h) 60% 88%); color: hsl(var(--h) 55% 24%); 
     background: hsl(var(--h) 55% 50%);
 }
 .qcard:hover { transform: translateY(-2px); box-shadow: var(--lift); border-color: var(--rule-strong); color: inherit; }
+.qcard .chip { align-self: flex-start; }
 .qcard h3 { font-size: 1.15rem; margin: .15rem 0 0; }
 .qcard p { color: var(--ink-2); font-size: .92rem; margin: 0; }
 .qcard .facts { margin-top: auto; padding-top: .6rem; border-top: 1px dashed var(--rule); display: flex; gap: 1rem; font-family: var(--mono); font-size: .78rem; color: var(--ink-3); }
