@@ -87,9 +87,35 @@ Open <http://localhost:8080> and sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` f
 
 The image is a multi-stage build: Maven compiles the jar, then it runs on a slim Java 21 JRE as a non-root user. A health check at `/actuator/health` reports `UP` once the database connection works.
 
-### Deploying the image
+### Free deployment: Render + Neon
 
-Any host that runs containers works (Render, Railway, Fly.io, a VPS). Point the app at a managed PostgreSQL database with these environment variables: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` and, if the platform assigns one, `PORT`. Use `/actuator/health` as the health-check path.
+The repo includes a [`render.yaml`](render.yaml) blueprint, so Render builds the Docker image itself.
+
+**1. Database on [Neon](https://neon.tech)**
+1. Create a free project. Pick the **AWS Asia Pacific (Singapore)** region so it sits next to the Render service.
+2. Open **Connect**, turn **Connection pooling off** and copy the connection string. It looks like
+   `postgresql://USER:PASSWORD@ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+3. Split it into three values:
+   - `DB_URL` = `jdbc:postgresql://ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
+   - `DB_USERNAME` = `USER`
+   - `DB_PASSWORD` = `PASSWORD`
+
+**2. App on [Render](https://render.com)**
+1. Sign in with GitHub and choose **New → Blueprint**.
+2. Select this repository. Render reads `render.yaml` and asks for the secret values.
+3. Enter the three Neon values above, plus an `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`.
+4. Click **Apply**. The first build takes a few minutes. The app is live at `https://online-quiz-portal-xxxx.onrender.com` once the health check at `/actuator/health` passes.
+
+**What to expect on the free tiers**
+- Render puts the service to sleep after 15 minutes without traffic. The next visit wakes it in about 2 minutes, and pages are fast after that.
+- Neon suspends the database when it's idle and resumes it in about a second. The connection pool is configured to let it sleep.
+- Each push to `main` redeploys automatically.
+
+The image starts faster on small CPUs because it includes a class-data-sharing archive generated during the build. Under Render-free-like limits (0.1 CPU, 512 MB), startup drops from about 7 minutes to about 2.
+
+### Other hosts
+
+Any container host works (Railway, Fly.io, a VPS). Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` and, if the platform assigns one, `PORT`. Use `/actuator/health` as the health-check path.
 
 ---
 
