@@ -100,6 +100,23 @@ public class Attempt {
         return questionCount == 0 ? 0 : Math.round(100f * correctCount / questionCount);
     }
 
+    /** Answered, but not with the right choice. */
+    public long getWrongCount() {
+        return answers.stream().filter(a -> !a.isSkipped() && !a.isCorrect()).count();
+    }
+
+    public long getSkippedCount() {
+        return answers.stream().filter(AttemptAnswer::isSkipped).count();
+    }
+
+    /** Wrong or skipped answers, in question order: the ones worth reviewing. */
+    public List<AttemptAnswer> getMistakes() {
+        return answers.stream()
+                .filter(a -> !a.isCorrect())
+                .sorted(java.util.Comparator.comparingInt(a -> a.getQuestion().getSequence()))
+                .toList();
+    }
+
     public boolean isPassed() {
         return getPercent() >= quiz.getPassMark();
     }

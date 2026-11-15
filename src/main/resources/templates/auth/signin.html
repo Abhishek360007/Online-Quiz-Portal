@@ -3,15 +3,28 @@
 <head th:replace="~{fragments/shell :: head('Sign in')}"></head>
 <body>
 <main class="auth">
-    <div class="auth-box">
-        <div class="auth-head">
-            <h1>Online Quiz Portal</h1>
-            <p>Sign in to your account</p>
+    <aside class="auth-side">
+        <a class="brand" th:href="@{/}"><svg th:replace="~{fragments/shell :: seal}"></svg><span>Online Quiz Portal</span></a>
+        <div>
+            <h2>Welcome back. Your next quiz is waiting.</h2>
+            <p>Pick up where you left off, check your scores and see how you rank against everyone else.</p>
         </div>
-        <div class="panel">
+        <ul class="auth-points">
+            <li><b>01</b> Timed quizzes with a clock you can trust</li>
+            <li><b>02</b> Instant scores, no waiting</li>
+            <li><b>03</b> Every wrong answer explained</li>
+        </ul>
+    </aside>
+
+    <section class="auth-main">
+        <div class="auth-box stack">
+            <div>
+                <h1>Sign in</h1>
+                <p class="muted">Use the email you registered with.</p>
+            </div>
             <th:block th:replace="~{fragments/shell :: flash}"></th:block>
-            <div class="problem" th:if="${param.failed}">Wrong email or password.</div>
-            <div class="notice" th:if="${param.bye}">You've signed out.</div>
+            <div class="problem" th:if="${param.failed}">That email and password don't match. Try again.</div>
+            <div class="notice" th:if="${param.bye}">You've signed out. See you soon.</div>
 
             <form th:action="@{/signin}" method="post">
                 <div class="field">
@@ -22,11 +35,11 @@
                     <label for="password">Password</label>
                     <input class="input" type="password" id="password" name="password" autocomplete="current-password" required>
                 </div>
-                <button class="btn wide" type="submit">Sign in</button>
+                <button class="btn accent wide big" type="submit">Sign in</button>
             </form>
-            <p class="small muted mt">No account yet? <a th:href="@{/signup}">Sign up as a student</a></p>
+            <p class="small muted">New here? <a th:href="@{/signup}">Create an account</a>. It takes a minute.</p>
         </div>
-    </div>
+    </section>
 </main>
 </body>
 </html>

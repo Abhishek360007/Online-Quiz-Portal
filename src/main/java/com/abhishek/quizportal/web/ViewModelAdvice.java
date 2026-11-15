@@ -19,4 +19,10 @@ class ViewModelAdvice {
     Account me() {
         return WebConfig.signedInAccount(accounts);
     }
+
+    /** Current path, so the navigation can highlight the section you're in. */
+    @ModelAttribute("path")
+    String path(jakarta.servlet.http.HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 }

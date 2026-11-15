@@ -2,6 +2,8 @@ package com.abhishek.quizportal.web;
 
 import com.abhishek.quizportal.domain.Account;
 import com.abhishek.quizportal.service.AccountService;
+import com.abhishek.quizportal.service.QuizCatalogService;
+import org.springframework.ui.Model;
 import com.abhishek.quizportal.web.form.SignUpForm;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -15,14 +17,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 class AuthController {
 
     private final AccountService accounts;
+    private final QuizCatalogService catalog;
 
-    AuthController(AccountService accounts) {
+    AuthController(AccountService accounts, QuizCatalogService catalog) {
         this.accounts = accounts;
+        this.catalog = catalog;
     }
 
+    /** Public landing page; signed-in users go straight to their home page. */
     @GetMapping("/")
-    String root(@SignedIn Account me) {
-        return me == null ? "redirect:/signin" : "redirect:/home";
+    String root(@SignedIn Account me, Model model) {
+        if (me != null) {
+            return "redirect:/home";
+        }
+        model.addAttribute("quizTotal", catalog.liveCount());
+        model.addAttribute("questionTotal", catalog.liveQuestionCount());
+        model.addAttribute("topics", catalog.liveTopicCounts());
+        return "landing";
     }
 
     @GetMapping("/signin")

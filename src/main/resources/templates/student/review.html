@@ -5,51 +5,136 @@
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page narrow stack">
 
-    <section class="panel score-hero">
-        <p class="muted small" style="margin:0" th:if="${me.admin}" th:text="${attempt.student.displayName} + '\'s attempt'"></p>
-        <h1 th:text="${attempt.quiz.title}">Quiz</h1>
-        <div class="score-ring" th:classappend="${attempt.passed} ? 'passed'" th:text="${attempt.percent} + '%'">0%</div>
-        <p style="margin:0">
-            <strong th:text="${attempt.correctCount}"></strong> of <strong th:text="${attempt.questionCount}"></strong> correct
-            · <span th:text="${attempt.durationText}"></span>
-        </p>
-        <p class="mt">
-            <span class="tag good" th:if="${attempt.passed}">Passed</span>
-            <span class="tag bad" th:unless="${attempt.passed}" th:text="'Below the ' + ${attempt.quiz.passMark} + '% pass mark'"></span>
-        </p>
-        <div class="problem" th:if="${attempt.expired}">
-            Your answers arrived after the time limit, so they weren't counted.
+    <!-- ===== score summary ===== -->
+    <section class="sheet result-hero">
+        <div class="ring" th:classappend="${attempt.passed} ? 'passed'"
+             th:with="c=${2 * 3.14159 * 62}">
+            <svg viewBox="0 0 140 140" aria-hidden="true">
+                <circle class="track" cx="70" cy="70" r="62" fill="none" stroke-width="12"/>
+                <circle class="value" cx="70" cy="70" r="62" fill="none" stroke-width="12"
+                        th:attr="stroke-dasharray=${c}, stroke-dashoffset=${c * (100 - attempt.percent) / 100}"/>
+            </svg>
+            <div class="ring-label">
+                <div><strong th:text="${attempt.percent} + '%'">0%</strong><span th:text="${attempt.passed} ? 'PASSED' : 'NEEDS ' + ${attempt.quiz.passMark} + '%'">RESULT</span></div>
+            </div>
+        </div>
+        <div>
+            <span class="eyebrow" th:if="${me.admin}" th:text="${attempt.student.displayName} + '\'s attempt'">Attempt</span>
+            <span class="eyebrow" th:unless="${me.admin}" th:text="${attempt.passed} ? 'Nicely done' : 'Keep going'">Result</span>
+            <h1 th:text="${attempt.quiz.title}">Quiz</h1>
+            <div class="tally">
+                <div class="t-good"><strong th:text="${attempt.correctCount}">0</strong>correct</div>
+                <div class="t-bad"><strong th:text="${attempt.wrongCount}">0</strong>wrong</div>
+                <div><strong th:text="${attempt.skippedCount}">0</strong>skipped</div>
+                <div><strong th:text="${attempt.durationText}">0m</strong>time used</div>
+            </div>
+            <div class="row">
+                <form th:if="${!me.admin and attempt.quiz.live}" method="post" th:action="@{/catalog/{id}/begin(id=${attempt.quiz.id})}" class="inline">
+                    <button class="btn accent" type="submit">Retake quiz</button>
+                </form>
+                <a class="btn ghost" th:unless="${me.admin}" th:href="@{/catalog}">Another quiz</a>
+                <a class="btn ghost" th:if="${me.admin}" th:href="@{/admin/quizzes/{id}/scores(id=${attempt.quiz.id})}">Back to scores</a>
+            </div>
         </div>
     </section>
 
-    <section class="panel flush">
-        <div class="panel-title">Answers</div>
-        <div class="question" th:each="q, i : ${attempt.quiz.questions}"
-             th:with="ans=${attempt.answerFor(q).orElse(null)}, picked=${ans != null ? ans.chosenIndex : null}">
-            <div class="question-head">
-                <div><span class="question-num" th:text="${i.count} + '.'"></span><span th:text="${q.prompt}"></span></div>
-                <span class="tag good" th:if="${ans != null and ans.correct}">Correct</span>
-                <span class="tag bad" th:if="${ans != null and !ans.correct and !ans.skipped}">Wrong</span>
-                <span class="tag" th:if="${ans == null or ans.skipped}">Skipped</span>
+    <div class="problem" th:if="${attempt.expired}">
+        Time ran out before these answers reached the server, so none of them were counted.
+    </div>
+
+    <!-- ===== what to review ===== -->
+    <section class="sheet" th:unless="${#lists.isEmpty(attempt.mistakes)}">
+        <h2>What to review</h2>
+        <p class="muted small">You missed these questions. Tap one to jump to its correction.</p>
+        <div class="mistake-index">
+            <a th:each="m : ${attempt.mistakes}" th:href="'#r-' + ${m.question.id}"
+               th:classappend="${m.skipped} ? 'skipped'"
+               th:text="'Q' + ${attempt.quiz.questions.indexOf(m.question) + 1}">Q1</a>
+        </div>
+    </section>
+    <section class="notice" th:if="${#lists.isEmpty(attempt.mistakes)}">
+        Perfect score! You got every question right.
+    </section>
+
+    <!-- ===== answer-by-answer review ===== -->
+    <section class="sheet flush" data-review>
+        <div class="sheet-head">
+            <h2>Answers</h2>
+            <div class="filter" role="group" aria-label="Show" th:unless="${#lists.isEmpty(attempt.mistakes)}">
+                <button type="button" class="on" data-show="all">All</button>
+                <button type="button" data-show="mistakes" th:text="'Mistakes (' + ${#lists.size(attempt.mistakes)} + ')'">Mistakes</button>
             </div>
+        </div>
+
+        <article class="q" th:each="q, i : ${attempt.quiz.questions}" th:id="'r-' + ${q.id}"
+                 th:with="ans=${attempt.answerFor(q).orElse(null)},
+                          picked=${ans != null ? ans.chosenIndex : null},
+                          right=${ans != null and ans.correct}"
+                 th:classappend="${right} ? 'was-right'">
+            <div class="q-head">
+                <div>
+                    <span class="q-num" th:text="'QUESTION ' + ${#numbers.formatInteger(i.count, 2)}">QUESTION 01</span>
+                    <div class="q-prompt" th:text="${q.prompt}">Prompt</div>
+                </div>
+                <span class="verdict good" th:if="${right}">Correct</span>
+                <span class="verdict bad" th:if="${picked != null and !right}">Wrong</span>
+                <span class="verdict skip" th:if="${picked == null}">Skipped</span>
+            </div>
+
             <ul class="choices">
-                <li th:each="c, ci : ${q.choices}"
-                    th:classappend="${ci.index == q.answerIndex} ? 'right-answer' : (${picked != null and ci.index == picked} ? 'wrong-answer' : '')">
-                    <span th:text="${c}"></span>
-                    <span class="muted small" th:if="${picked != null and ci.index == picked}"> — your answer</span>
+                <li class="choice" th:each="c, ci : ${q.choices}"
+                    th:classappend="${ci.index == q.answerIndex} ? 'is-right' : (${picked != null and ci.index == picked} ? 'is-wrong' : '')">
+                    <span class="bubble" th:text="${@ui.letter(ci.index)}">A</span>
+                    <span th:text="${c}">Choice</span>
+                    <span class="note" th:if="${ci.index == q.answerIndex and picked != null and ci.index == picked}">your answer ✓</span>
+                    <span class="note" th:if="${ci.index == q.answerIndex and (picked == null or ci.index != picked)}">correct answer</span>
+                    <span class="note" th:if="${picked != null and ci.index == picked and ci.index != q.answerIndex}">your answer</span>
                 </li>
             </ul>
-            <p class="why" th:if="${q.explanation}" th:text="${q.explanation}"></p>
-        </div>
-    </section>
 
-    <div class="row">
-        <th:block th:unless="${me.admin}">
-            <a class="btn" th:href="@{/catalog}">Another quiz</a>
-            <a class="btn ghost" th:href="@{/my/attempts}">All my attempts</a>
-        </th:block>
-        <a class="btn ghost" th:if="${me.admin}" th:href="@{/admin/quizzes/{id}/scores(id=${attempt.quiz.id})}">Back to scores</a>
-    </div>
+            <!-- correction for wrong or skipped answers -->
+            <details class="correction" th:unless="${right}" open>
+                <summary>Correction: why <span th:text="${@ui.letter(q.answerIndex)}">A</span> is the right answer</summary>
+                <div class="correction-body">
+                    <div class="compare">
+                        <div class="yours">
+                            <span class="lbl" th:text="${picked != null} ? 'You answered' : 'You skipped this'">You answered</span>
+                            <span class="val" th:if="${picked != null}" th:text="${@ui.letter(picked)} + '. ' + ${q.choices[picked]}">B</span>
+                            <span th:if="${picked == null}" class="faint">No answer given</span>
+                        </div>
+                        <div class="right-one">
+                            <span class="lbl">Correct answer</span>
+                            <span th:text="${@ui.letter(q.answerIndex)} + '. ' + ${q.answerLabel}">C</span>
+                        </div>
+                    </div>
+                    <p class="explain" th:if="${q.explanation}">
+                        <span class="lbl">Explanation: </span><span th:text="${q.explanation}">Because…</span>
+                    </p>
+                    <p class="explain faint" th:unless="${q.explanation}">
+                        No explanation has been added for this question yet. Remember the correct answer above.
+                    </p>
+                </div>
+            </details>
+
+            <!-- for right answers, the explanation is still there but tucked away -->
+            <details class="why-right" th:if="${right and q.explanation != null}">
+                <summary>Why this is right</summary>
+                <p th:text="${q.explanation}">Because…</p>
+            </details>
+        </article>
+    </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
+
+<script>
+    (() => {
+        const review = document.querySelector('[data-review]');
+        const buttons = document.querySelectorAll('[data-show]');
+        buttons.forEach(btn => btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.toggle('on', b === btn));
+            review.classList.toggle('only-mistakes', btn.dataset.show === 'mistakes');
+        }));
+    })();
+</script>
 </body>
 </html>

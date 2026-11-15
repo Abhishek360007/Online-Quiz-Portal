@@ -36,6 +36,7 @@ class HomeController {
         model.addAttribute("attemptTotal", attempts.finishedCount(me));
         model.addAttribute("average", attempts.averagePercent(me));
         model.addAttribute("activity", attempts.historyOf(me).stream().limit(5).toList());
+        model.addAttribute("suggestions", catalog.suggestionsFor(me, 3));
         return "home/student";
     }
 

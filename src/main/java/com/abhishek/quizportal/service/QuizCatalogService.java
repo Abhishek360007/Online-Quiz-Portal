@@ -95,6 +95,19 @@ public class QuizCatalogService {
         return quizzes.countByLiveTrue();
     }
 
+    public long liveQuestionCount() {
+        return quizzes.countLiveQuestions();
+    }
+
+    public List<com.abhishek.quizportal.web.view.TopicCount> liveTopicCounts() {
+        return quizzes.liveTopicCounts();
+    }
+
+    /** Up to {@code limit} live quizzes the student hasn't finished yet. */
+    public List<Quiz> suggestionsFor(com.abhishek.quizportal.domain.Account student, int limit) {
+        return quizzes.findLiveNotFinishedBy(student).stream().limit(limit).toList();
+    }
+
     // ---- questions ----
 
     @Transactional

@@ -30,4 +30,20 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     List<String> findLiveTopics();
 
     long countByLiveTrue();
+
+    @Query("select new com.abhishek.quizportal.web.view.TopicCount(q.topic, count(q)) "
+            + "from Quiz q where q.live = true group by q.topic order by count(q) desc, q.topic")
+    List<com.abhishek.quizportal.web.view.TopicCount> liveTopicCounts();
+
+    @Query("select count(qs) from Question qs where qs.quiz.live = true")
+    long countLiveQuestions();
+
+    /** Live quizzes this student has not finished yet, newest first. */
+    @Query("""
+            select q from Quiz q
+            where q.live = true
+              and q not in (select a.quiz from Attempt a where a.student = :student and a.finishedAt is not null)
+            order by q.createdAt desc
+            """)
+    List<Quiz> findLiveNotFinishedBy(@Param("student") com.abhishek.quizportal.domain.Account student);
 }

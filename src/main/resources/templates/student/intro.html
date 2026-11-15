@@ -4,23 +4,34 @@
 <body>
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page narrow stack">
-    <a class="small" th:href="@{/catalog}">← Browse quizzes</a>
-    <section class="panel stack">
-        <div>
-            <span class="tag" th:text="${quiz.topic}"></span>
+    <div>
+        <a class="back" th:href="@{/catalog}">← All quizzes</a>
+        <div class="page-head">
+            <span class="chip" th:style="'--h:' + ${@ui.hue(quiz.topic)}" th:text="${quiz.topic}">Topic</span>
             <h1 class="mt" th:text="${quiz.title}">Quiz</h1>
-            <p th:if="${quiz.description}" th:text="${quiz.description}"></p>
+            <p class="muted" th:if="${quiz.description}" th:text="${quiz.description}"></p>
         </div>
-        <ul>
-            <li><strong th:text="${#lists.size(quiz.questions)}"></strong> multiple-choice questions</li>
-            <li><strong th:text="${quiz.timeLimitMinutes} + ' minutes'"></strong> once you start — the clock keeps running if you leave</li>
-            <li>You need <strong th:text="${quiz.passMark} + '%'"></strong> to pass</li>
-            <li>When time is up your answers are submitted automatically</li>
+    </div>
+
+    <section class="stats">
+        <div class="stat"><div class="stat-label">Questions</div><div class="stat-value" th:text="${#lists.size(quiz.questions)}">0</div></div>
+        <div class="stat"><div class="stat-label">Time</div><div class="stat-value"><span th:text="${quiz.timeLimitMinutes}">0</span><small> min</small></div></div>
+        <div class="stat"><div class="stat-label">To pass</div><div class="stat-value"><span th:text="${quiz.passMark}">0</span><small>%</small></div></div>
+    </section>
+
+    <section class="sheet">
+        <h2>Before you start</h2>
+        <ul class="muted" style="padding-left:1.1rem;margin:.6rem 0 1.4rem">
+            <li>The clock starts as soon as you press the button and keeps running if you leave the page.</li>
+            <li>You can answer questions in any order. Use the numbers at the top to jump around.</li>
+            <li>When time runs out, your answers are submitted automatically.</li>
+            <li>Afterwards you'll see the right answer and an explanation for everything you missed.</li>
         </ul>
         <form method="post" th:action="@{/catalog/{id}/begin(id=${quiz.id})}">
-            <button class="btn" type="submit">Start the quiz</button>
+            <button class="btn accent big" type="submit">Start the quiz</button>
         </form>
     </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

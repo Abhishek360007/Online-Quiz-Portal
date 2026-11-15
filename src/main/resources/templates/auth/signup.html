@@ -3,12 +3,25 @@
 <head th:replace="~{fragments/shell :: head('Sign up')}"></head>
 <body>
 <main class="auth">
-    <div class="auth-box">
-        <div class="auth-head">
-            <h1>Create an account</h1>
-            <p>Take quizzes, see your scores, climb the leaderboard</p>
+    <aside class="auth-side">
+        <a class="brand" th:href="@{/}"><svg th:replace="~{fragments/shell :: seal}"></svg><span>Online Quiz Portal</span></a>
+        <div>
+            <h2>Practise smarter, not just harder.</h2>
+            <p>Make a free student account to take quizzes, keep a history of your attempts and get on the leaderboard.</p>
         </div>
-        <div class="panel">
+        <ul class="auth-points">
+            <li><b>01</b> Java, C++, SQL, DSA, aptitude and more</li>
+            <li><b>02</b> See the correct answer for every mistake</li>
+            <li><b>03</b> Free, with no ads</li>
+        </ul>
+    </aside>
+
+    <section class="auth-main">
+        <div class="auth-box stack">
+            <div>
+                <h1>Create an account</h1>
+                <p class="muted">Already registered? <a th:href="@{/signin}">Sign in</a></p>
+            </div>
             <form th:action="@{/signup}" th:object="${form}" method="post" novalidate>
                 <div class="field" th:classappend="${#fields.hasErrors('displayName')} ? 'has-error'">
                     <label for="displayName">Your name</label>
@@ -20,22 +33,23 @@
                     <input class="input" type="email" id="email" th:field="*{email}" autocomplete="email">
                     <div class="error-text" th:errors="*{email}"></div>
                 </div>
-                <div class="field" th:classappend="${#fields.hasErrors('password')} ? 'has-error'">
-                    <label for="password">Password</label>
-                    <input class="input" type="password" id="password" th:field="*{password}" autocomplete="new-password">
-                    <div class="hint">8+ characters, including a number.</div>
-                    <div class="error-text" th:errors="*{password}"></div>
+                <div class="grid-2">
+                    <div class="field" th:classappend="${#fields.hasErrors('password')} ? 'has-error'">
+                        <label for="password">Password</label>
+                        <input class="input" type="password" id="password" th:field="*{password}" autocomplete="new-password">
+                        <div class="error-text" th:errors="*{password}"></div>
+                    </div>
+                    <div class="field" th:classappend="${#fields.hasErrors('passwordsMatch')} ? 'has-error'">
+                        <label for="repeatPassword">Repeat it</label>
+                        <input class="input" type="password" id="repeatPassword" th:field="*{repeatPassword}" autocomplete="new-password">
+                        <div class="error-text" th:errors="*{passwordsMatch}"></div>
+                    </div>
                 </div>
-                <div class="field" th:classappend="${#fields.hasErrors('passwordsMatch')} ? 'has-error'">
-                    <label for="repeatPassword">Repeat password</label>
-                    <input class="input" type="password" id="repeatPassword" th:field="*{repeatPassword}" autocomplete="new-password">
-                    <div class="error-text" th:errors="*{passwordsMatch}"></div>
-                </div>
-                <button class="btn wide" type="submit">Create account</button>
+                <p class="hint" style="margin-top:-.4rem">At least 8 characters, including a number.</p>
+                <button class="btn accent wide big" type="submit">Create account</button>
             </form>
-            <p class="small muted mt">Already registered? <a th:href="@{/signin}">Sign in</a></p>
         </div>
-    </div>
+    </section>
 </main>
 </body>
 </html>

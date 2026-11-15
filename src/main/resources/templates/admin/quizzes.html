@@ -6,25 +6,28 @@
 <main class="page stack">
     <th:block th:replace="~{fragments/shell :: flash}"></th:block>
 
-    <div class="spread">
-        <h1>Quizzes</h1>
-        <a class="btn" th:href="@{/admin/quizzes/create}">+ New quiz</a>
+    <div class="spread page-head">
+        <div>
+            <span class="eyebrow" th:text="${#lists.size(quizzes)} + ' quizzes'">Quizzes</span>
+            <h1>Manage quizzes</h1>
+        </div>
+        <a class="btn accent" th:href="@{/admin/quizzes/create}">+ New quiz</a>
     </div>
 
-    <section class="panel flush">
-        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(quizzes)}">
-            You haven't made any quizzes yet.
-        </p>
+    <section class="sheet flush">
+        <div class="empty" th:if="${#lists.isEmpty(quizzes)}">You haven't made any quizzes yet.</div>
         <div class="table-wrap" th:unless="${#lists.isEmpty(quizzes)}">
             <table>
-                <thead><tr><th>Title</th><th>Topic</th><th>Questions</th><th>Time</th><th>Pass mark</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Quiz</th><th>Questions</th><th>Time</th><th>Pass</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                 <tr th:each="q : ${quizzes}">
-                    <td><a th:href="@{/admin/quizzes/{id}(id=${q.id})}" th:text="${q.title}"></a></td>
-                    <td th:text="${q.topic}"></td>
-                    <td th:text="${#lists.size(q.questions)}"></td>
-                    <td th:text="${q.timeLimitMinutes} + ' min'"></td>
-                    <td th:text="${q.passMark} + '%'"></td>
+                    <td>
+                        <a th:href="@{/admin/quizzes/{id}(id=${q.id})}"><strong th:text="${q.title}"></strong></a><br>
+                        <span class="chip" th:style="'--h:' + ${@ui.hue(q.topic)}" th:text="${q.topic}"></span>
+                    </td>
+                    <td class="score" th:text="${#lists.size(q.questions)}"></td>
+                    <td class="mono small" th:text="${q.timeLimitMinutes} + ' min'"></td>
+                    <td class="mono small" th:text="${q.passMark} + '%'"></td>
                     <td><span class="tag" th:classappend="${q.live} ? 'live'" th:text="${q.live} ? 'Live' : 'Draft'"></span></td>
                     <td class="right nowrap">
                         <a class="btn ghost small" th:href="@{/admin/quizzes/{id}(id=${q.id})}">Manage</a>
@@ -36,5 +39,6 @@
         </div>
     </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

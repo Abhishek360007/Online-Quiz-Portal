@@ -5,32 +5,37 @@
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page narrow stack">
     <div>
-        <a class="small" th:href="${quiz == null} ? @{/admin/quizzes} : @{/admin/quizzes/{id}(id=${quiz.id})}">← Back</a>
-        <h1 th:text="${quiz == null} ? 'New quiz' : 'Quiz settings'">Quiz</h1>
+        <a class="back" th:href="${quiz == null} ? @{/admin/quizzes} : @{/admin/quizzes/{id}(id=${quiz.id})}">← Back</a>
+        <div class="page-head">
+            <span class="eyebrow" th:text="${quiz == null} ? 'Step 1 of 2' : 'Edit'">Quiz</span>
+            <h1 th:text="${quiz == null} ? 'New quiz' : 'Quiz settings'">Quiz</h1>
+            <p class="muted" th:if="${quiz == null}">Set the basics now. You'll add questions on the next screen.</p>
+        </div>
     </div>
 
-    <form class="panel" method="post" novalidate th:object="${form}"
+    <form class="sheet" method="post" novalidate th:object="${form}"
           th:action="${quiz == null} ? @{/admin/quizzes/create} : @{/admin/quizzes/{id}/settings(id=${quiz.id})}">
 
         <div class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
             <label for="title">Title</label>
-            <input class="input" id="title" th:field="*{title}">
+            <input class="input" id="title" th:field="*{title}" placeholder="e.g. Java Collections">
             <div class="error-text" th:errors="*{title}"></div>
         </div>
 
         <div class="field" th:classappend="${#fields.hasErrors('topic')} ? 'has-error'">
             <label for="topic">Topic</label>
-            <input class="input" id="topic" th:field="*{topic}" placeholder="Java, SQL, General knowledge…">
+            <input class="input" id="topic" th:field="*{topic}" placeholder="Java, SQL, Aptitude…">
+            <div class="hint">Quizzes with the same topic are grouped together for students.</div>
             <div class="error-text" th:errors="*{topic}"></div>
         </div>
 
         <div class="field" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
-            <label for="description">Description <span class="muted small">(optional)</span></label>
-            <textarea id="description" rows="3" th:field="*{description}"></textarea>
+            <label for="description">Description <span class="faint small">(optional)</span></label>
+            <textarea id="description" rows="3" th:field="*{description}" placeholder="One or two lines about what the quiz covers"></textarea>
             <div class="error-text" th:errors="*{description}"></div>
         </div>
 
-        <div class="split">
+        <div class="grid-2">
             <div class="field" th:classappend="${#fields.hasErrors('timeLimitMinutes')} ? 'has-error'">
                 <label for="timeLimitMinutes">Time limit (minutes)</label>
                 <input class="input" type="number" min="1" max="240" id="timeLimitMinutes" th:field="*{timeLimitMinutes}">
@@ -43,9 +48,10 @@
             </div>
         </div>
 
-        <p class="hint" th:if="${quiz == null}">The quiz starts as a draft that students can't see.</p>
-        <button class="btn" type="submit" th:text="${quiz == null} ? 'Create quiz' : 'Save settings'">Save</button>
+        <p class="hint" th:if="${quiz == null}">New quizzes start as drafts, hidden from students until you publish them.</p>
+        <button class="btn accent" type="submit" th:text="${quiz == null} ? 'Create quiz and add questions' : 'Save settings'">Save</button>
     </form>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /*
- * Quiz clock: counts down the seconds the server says are left, keeps an
- * "answered" tally, and submits the form automatically at zero. The server
- * still enforces the deadline, so this is a convenience, not a guard.
+ * Quiz page: countdown clock, progress rail and answered tally.
+ * The server enforces the deadline; this only keeps the student informed
+ * and submits automatically at zero.
  */
 (() => {
     const form = document.querySelector('[data-quiz-form]');
@@ -9,27 +9,35 @@
 
     const clock = document.querySelector('[data-clock]');
     const tally = document.querySelector('[data-tally]');
+    const bar = document.querySelector('[data-progress]');
     const total = Number(form.dataset.questions);
     let left = Number(clock.dataset.seconds);
     let leaving = false;
 
-    const answered = () => new Set(
-        [...form.querySelectorAll('input[type=radio]:checked')].map(r => r.name)
-    ).size;
+    const answeredIds = () => new Set(
+        [...form.querySelectorAll('input[type=radio]:checked')].map(r => r.name.replace('answer-', ''))
+    );
 
     const paint = () => {
         const mins = Math.floor(left / 60);
         const secs = String(left % 60).padStart(2, '0');
         clock.textContent = `${mins}:${secs}`;
         clock.classList.toggle('low', left <= 60);
-        tally.textContent = `${answered()} of ${total} answered`;
+
+        const done = answeredIds();
+        tally.textContent = `${done.size} of ${total} answered`;
+        bar.style.width = `${total ? (done.size / total) * 100 : 0}%`;
+        document.querySelectorAll('[data-rail]').forEach(dot => {
+            dot.classList.toggle('done', done.has(dot.dataset.rail));
+        });
     };
 
     form.addEventListener('change', paint);
 
     form.addEventListener('submit', (event) => {
-        if (left > 0 && answered() < total &&
-            !window.confirm('Some questions are unanswered. Submit anyway?')) {
+        const done = answeredIds().size;
+        if (left > 0 && done < total &&
+            !window.confirm(`You've answered ${done} of ${total}. Submit anyway?`)) {
             event.preventDefault();
             return;
         }

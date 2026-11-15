@@ -6,42 +6,51 @@
 <main class="page narrow stack">
     <th:block th:replace="~{fragments/shell :: flash}"></th:block>
     <div>
-        <a class="small" th:href="@{/admin/quizzes/{id}(id=${quiz.id})}">← <span th:text="${quiz.title}">Quiz</span></a>
-        <h1 th:text="${question == null} ? 'Add question' : 'Edit question'">Question</h1>
+        <a class="back" th:href="@{/admin/quizzes/{id}(id=${quiz.id})}">← <span th:text="${quiz.title}">Quiz</span></a>
+        <div class="page-head">
+            <span class="eyebrow" th:text="${quiz.title}">Quiz</span>
+            <h1 th:text="${question == null} ? 'Add question' : 'Edit question'">Question</h1>
+        </div>
     </div>
 
-    <form class="panel" method="post" novalidate th:object="${form}"
+    <form class="sheet" method="post" novalidate th:object="${form}"
           th:action="${question == null} ? @{/admin/quizzes/{id}/questions/create(id=${quiz.id})} : @{/admin/questions/{id}(id=${question.id})}">
 
         <div class="field" th:classappend="${#fields.hasErrors('prompt')} ? 'has-error'">
             <label for="prompt">Question</label>
-            <textarea id="prompt" rows="3" th:field="*{prompt}"></textarea>
+            <textarea id="prompt" rows="3" th:field="*{prompt}" placeholder="Write the question as students will see it"></textarea>
             <div class="error-text" th:errors="*{prompt}"></div>
         </div>
 
         <div class="field">
             <span class="label">Choices</span>
-            <p class="hint" style="margin-top:0">Fill in 2 to 6 choices and select the correct one. Leave extra slots empty.</p>
-            <div class="choice-slot" th:each="c, i : *{choices}">
-                <input type="radio" th:field="*{answerSlot}" th:value="${i.index}" th:title="'Choice ' + ${i.count} + ' is correct'">
+            <p class="hint" style="margin:0 0 .7rem">Fill in 2 to 6 choices. Click a letter to mark the correct one. Leave extra slots empty.</p>
+            <div class="slot" th:each="c, i : *{choices}">
+                <label class="slot-letter" th:title="'Mark ' + ${@ui.letter(i.index)} + ' as correct'">
+                    <input type="radio" th:field="*{answerSlot}" th:value="${i.index}">
+                    <span th:text="${@ui.letter(i.index)}">A</span>
+                </label>
                 <input class="input" th:field="*{choices[__${i.index}__]}"
-                       th:placeholder="${i.count <= 2} ? 'Choice ' + ${i.count} : 'Choice ' + ${i.count} + ' (optional)'">
+                       th:placeholder="${i.count <= 2} ? 'Choice ' + ${@ui.letter(i.index)} : 'Choice ' + ${@ui.letter(i.index)} + ' (optional)'">
             </div>
             <div class="error-text" th:errors="*{enoughChoices}"></div>
             <div class="error-text" th:errors="*{answerMarked}"></div>
         </div>
 
         <div class="field" th:classappend="${#fields.hasErrors('explanation')} ? 'has-error'">
-            <label for="explanation">Explanation <span class="muted small">(optional, shown after the quiz)</span></label>
-            <textarea id="explanation" rows="2" th:field="*{explanation}"></textarea>
+            <label for="explanation">Explanation</label>
+            <textarea id="explanation" rows="3" th:field="*{explanation}"
+                      placeholder="Why is the correct answer right? Students who get it wrong see this in their correction."></textarea>
+            <div class="hint">Optional, but it's what makes the correction useful.</div>
             <div class="error-text" th:errors="*{explanation}"></div>
         </div>
 
         <div class="row">
-            <button class="btn" type="submit">Save question</button>
+            <button class="btn accent" type="submit">Save question</button>
             <button class="btn ghost" type="submit" name="next" value="another" th:if="${question == null}">Save and add another</button>
         </div>
     </form>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

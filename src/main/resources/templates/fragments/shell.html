@@ -5,35 +5,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title} + ' · Online Quiz Portal'">Online Quiz Portal</title>
+    <meta name="description" content="Timed quizzes on programming, computer science and aptitude, with instant scoring and corrections.">
+    <link rel="icon" th:href="@{/assets/seal.svg}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/assets/app.css}">
 </head>
 
 <body>
 
+<!-- Brand mark: an answer-sheet bubble with a tick -->
+<svg th:fragment="seal" class="brand-seal" viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 2.2"/>
+    <circle cx="16" cy="16" r="10.5" fill="#c8552b"/>
+    <path d="M11.3 16.4l3.1 3.1 6.4-6.6" fill="none" stroke="#fffcf6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
 <header th:fragment="topbar" class="topbar">
     <div class="topbar-inner">
-        <a class="brand" th:href="@{/home}"><span class="brand-mark">Q</span> Online Quiz Portal</a>
+        <a class="brand" th:href="${me != null} ? @{/home} : @{/}">
+            <svg th:replace="~{fragments/shell :: seal}"></svg>
+            <span>Online Quiz Portal</span>
+        </a>
+
         <nav class="nav" th:if="${me != null}">
-            <a th:href="@{/home}">Home</a>
+            <a th:href="@{/home}" th:classappend="${path == '/home'} ? 'on'">Home</a>
             <th:block th:if="${me.admin}">
-                <a th:href="@{/admin/quizzes}">Quizzes</a>
+                <a th:href="@{/admin/quizzes}" th:classappend="${#strings.startsWith(path, '/admin')} ? 'on'">Quizzes</a>
             </th:block>
             <th:block th:unless="${me.admin}">
-                <a th:href="@{/catalog}">Browse</a>
-                <a th:href="@{/my/attempts}">My attempts</a>
+                <a th:href="@{/catalog}" th:classappend="${#strings.startsWith(path, '/catalog')} ? 'on'">Browse</a>
+                <a th:href="@{/my/attempts}" th:classappend="${#strings.startsWith(path, '/my')} ? 'on'">My attempts</a>
             </th:block>
-            <a th:href="@{/leaderboard}">Leaderboard</a>
+            <a th:href="@{/leaderboard}" th:classappend="${path == '/leaderboard'} ? 'on'">Leaderboard</a>
         </nav>
+
         <div class="who" th:if="${me != null}">
-            <span th:text="${me.displayName}">Name</span>
-            <span class="tag" th:text="${me.admin} ? 'Admin' : 'Student'">Role</span>
-            <a class="nav-link-quiet" th:href="@{/account/password}">Change password</a>
-            <form th:action="@{/signout}" method="post">
-                <button class="btn light small" type="submit">Sign out</button>
-            </form>
+            <details class="who-menu">
+                <summary>
+                    <span class="avatar" th:text="${@ui.initials(me.displayName)}">AB</span>
+                    <span class="who-name" th:text="${me.displayName}">Name</span>
+                    <span class="faint small">▾</span>
+                </summary>
+                <div class="menu">
+                    <div class="menu-meta">
+                        <strong th:text="${me.displayName}">Name</strong><br>
+                        <span class="faint small" th:text="${me.admin} ? 'Administrator' : 'Student'">Role</span>
+                    </div>
+                    <a th:href="@{/account/password}">Change password</a>
+                    <form th:action="@{/signout}" method="post">
+                        <button type="submit">Sign out</button>
+                    </form>
+                </div>
+            </details>
+        </div>
+
+        <div class="row" th:if="${me == null}" style="margin-left:auto">
+            <a class="btn ghost small" th:href="@{/signin}">Sign in</a>
+            <a class="btn small" th:href="@{/signup}">Sign up</a>
         </div>
     </div>
 </header>
+
+<footer th:fragment="footer" class="footer">
+    <div class="footer-inner">
+        <span>Online Quiz Portal · built by Abhishek Raj</span>
+        <span class="mono">Spring Boot · PostgreSQL</span>
+    </div>
+</footer>
 
 <th:block th:fragment="flash">
     <div class="notice" th:if="${notice}" th:text="${notice}"></div>

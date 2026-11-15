@@ -7,10 +7,14 @@
 <div class="sit-bar">
     <div class="sit-bar-inner">
         <div>
-            <strong th:text="${attempt.quiz.title}">Quiz</strong>
-            <span class="muted small" data-tally>0 answered</span>
+            <div class="sit-title" th:text="${attempt.quiz.title}">Quiz</div>
+            <span class="faint small" data-tally>0 answered</span>
         </div>
-        <span class="clock" data-clock th:attr="data-seconds=${secondsLeft}">--:--</span>
+        <span class="clock" data-clock th:attr="data-seconds=${secondsLeft}" title="Time left">--:--</span>
+        <nav class="rail" aria-label="Jump to question">
+            <a th:each="q, i : ${attempt.quiz.questions}" th:href="'#q-' + ${q.id}" th:attr="data-rail=${q.id}" th:text="${i.count}">1</a>
+        </nav>
+        <div class="progress"><span data-progress></span></div>
     </div>
 </div>
 
@@ -19,16 +23,20 @@
           th:action="@{/attempt/{id}(id=${attempt.id})}"
           th:attr="data-questions=${#lists.size(attempt.quiz.questions)}">
 
-        <section class="panel" style="margin-bottom:1rem" th:each="q, i : ${attempt.quiz.questions}">
-            <p class="muted small" style="margin:0" th:text="'Question ' + ${i.count} + ' of ' + ${i.size}"></p>
-            <h2 th:text="${q.prompt}">Prompt</h2>
+        <section class="qsheet" th:each="q, i : ${attempt.quiz.questions}" th:id="'q-' + ${q.id}" th:attr="data-question=${q.id}">
+            <span class="q-num" th:text="'QUESTION ' + ${#numbers.formatInteger(i.count, 2)} + ' OF ' + ${#numbers.formatInteger(i.size, 2)}">QUESTION 01</span>
+            <p class="q-prompt" th:text="${q.prompt}">Prompt</p>
             <label class="pick" th:each="c, ci : ${q.choices}">
                 <input type="radio" th:name="'answer-' + ${q.id}" th:value="${ci.index}">
-                <span th:text="${c}"></span>
+                <span class="bubble" th:text="${@ui.letter(ci.index)}">A</span>
+                <span th:text="${c}">Choice</span>
             </label>
         </section>
 
-        <button class="btn wide" type="submit">Submit answers</button>
+        <div class="sheet row" style="justify-content:space-between">
+            <span class="muted small">Check the numbers at the top: dark ones are answered.</span>
+            <button class="btn accent big" type="submit">Submit answers</button>
+        </div>
     </form>
 </main>
 

@@ -5,26 +5,34 @@
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page stack">
     <div>
-        <a class="small" th:href="@{/admin/quizzes/{id}(id=${quiz.id})}">← <span th:text="${quiz.title}">Quiz</span></a>
-        <h1>Scores</h1>
+        <a class="back" th:href="@{/admin/quizzes/{id}(id=${quiz.id})}">← <span th:text="${quiz.title}">Quiz</span></a>
+        <div class="page-head">
+            <span class="eyebrow" th:text="${#lists.size(attempts)} + ' finished attempts'">Scores</span>
+            <h1>Scores</h1>
+        </div>
     </div>
 
-    <section class="panel flush">
-        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(attempts)}">No one has finished this quiz yet.</p>
+    <section class="sheet flush">
+        <div class="empty" th:if="${#lists.isEmpty(attempts)}">No one has finished this quiz yet.</div>
         <div class="table-wrap" th:unless="${#lists.isEmpty(attempts)}">
             <table>
                 <thead><tr><th>#</th><th>Student</th><th>Score</th><th>Result</th><th>Time used</th><th>Finished</th><th></th></tr></thead>
                 <tbody>
                 <tr th:each="a, i : ${attempts}">
-                    <td th:text="${i.count}"></td>
-                    <td><span th:text="${a.student.displayName}"></span><br><span class="muted small" th:text="${a.student.email}"></span></td>
-                    <td th:text="${a.correctCount} + ' / ' + ${a.questionCount}"></td>
+                    <td class="rank" th:text="${#numbers.formatInteger(i.count, 2)}">01</td>
+                    <td>
+                        <span class="person">
+                            <span class="avatar" th:text="${@ui.initials(a.student.displayName)}">AB</span>
+                            <span><strong th:text="${a.student.displayName}"></strong><br><span class="faint small" th:text="${a.student.email}"></span></span>
+                        </span>
+                    </td>
+                    <td class="score" th:text="${a.correctCount} + '/' + ${a.questionCount}"></td>
                     <td>
                         <span class="tag" th:classappend="${a.passed} ? 'good' : 'bad'" th:text="${a.percent} + '%'"></span>
                         <span class="tag warn" th:if="${a.expired}">Out of time</span>
                     </td>
-                    <td th:text="${a.durationText}"></td>
-                    <td class="nowrap" th:text="${#temporals.format(a.finishedAt, 'd MMM yyyy, HH:mm')}"></td>
+                    <td class="mono small" th:text="${a.durationText}"></td>
+                    <td class="nowrap faint" th:text="${#temporals.format(a.finishedAt, 'd MMM yyyy, HH:mm')}"></td>
                     <td class="right"><a class="btn ghost small" th:href="@{/attempt/{id}/review(id=${a.id})}">Open</a></td>
                 </tr>
                 </tbody>
@@ -32,5 +40,6 @@
         </div>
     </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

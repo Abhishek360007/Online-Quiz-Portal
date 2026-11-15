@@ -5,32 +5,47 @@
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page stack">
     <th:block th:replace="~{fragments/shell :: flash}"></th:block>
-    <h1>Browse quizzes</h1>
+
+    <div class="page-head">
+        <span class="eyebrow" th:text="${#lists.size(quizzes)} + ' quizzes'">Quizzes</span>
+        <h1>Browse quizzes</h1>
+        <p class="muted">Filter by topic or search for something specific.</p>
+    </div>
 
     <form class="row" method="get" th:action="@{/catalog}">
-        <input class="input" style="flex:2;min-width:200px" type="search" name="find" th:value="${find}" placeholder="Search titles and descriptions">
-        <select name="topic" style="flex:1;min-width:160px">
-            <option value="">Every topic</option>
-            <option th:each="t : ${topics}" th:value="${t}" th:text="${t}" th:selected="${t == topic}"></option>
-        </select>
-        <button class="btn ghost" type="submit">Apply</button>
+        <input type="hidden" name="topic" th:value="${topic}">
+        <input class="input" style="flex:1;min-width:220px;max-width:460px" type="search" name="find" th:value="${find}"
+               placeholder="Search, e.g. joins, pointers, Spring">
+        <button class="btn" type="submit">Search</button>
+        <a class="small" th:if="${find != null and find != ''}" th:href="@{/catalog(topic=${topic})}">Clear search</a>
     </form>
 
-    <p class="muted" th:if="${#lists.isEmpty(quizzes)}">Nothing matches right now. Try another search.</p>
+    <div class="chips">
+        <a class="chip plain" th:classappend="${topic == null or topic == ''} ? 'active'" th:href="@{/catalog(find=${find})}">All topics</a>
+        <a class="chip" th:each="t : ${topics}" th:text="${t}"
+           th:classappend="${t == topic} ? 'active'"
+           th:style="'--h:' + ${@ui.hue(t)}"
+           th:href="@{/catalog(topic=${t}, find=${find})}">Topic</a>
+    </div>
+
+    <div class="sheet empty" th:if="${#lists.isEmpty(quizzes)}">
+        No quizzes match that. Try another topic or a shorter search.
+    </div>
 
     <div class="cards">
-        <article class="card" th:each="q : ${quizzes}">
-            <span class="tag" th:text="${q.topic}" style="align-self:flex-start"></span>
-            <h2 th:text="${q.title}"></h2>
-            <p class="muted small" style="margin:0" th:if="${q.description}" th:text="${q.description}"></p>
+        <a class="qcard" th:each="q : ${quizzes}" th:href="@{/catalog/{id}(id=${q.id})}" th:style="'--h:' + ${@ui.hue(q.topic)}">
+            <span class="go">→</span>
+            <span class="chip" th:style="'--h:' + ${@ui.hue(q.topic)}" th:text="${q.topic}">Topic</span>
+            <h3 th:text="${q.title}">Quiz</h3>
+            <p th:if="${q.description}" th:text="${q.description}"></p>
             <div class="facts">
-                <span th:text="${#lists.size(q.questions)} + ' questions'"></span>
+                <span th:text="${#lists.size(q.questions)} + ' Qs'"></span>
                 <span th:text="${q.timeLimitMinutes} + ' min'"></span>
-                <span th:text="'Pass ' + ${q.passMark} + '%'"></span>
+                <span th:text="'pass ' + ${q.passMark} + '%'"></span>
             </div>
-            <a class="btn" th:href="@{/catalog/{id}(id=${q.id})}">View</a>
-        </article>
+        </a>
     </div>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/shell :: head('Practise with timed quizzes')}"></head>
+<body>
+<header th:replace="~{fragments/shell :: topbar}"></header>
+
+<main class="page">
+    <section class="hero">
+        <div>
+            <span class="eyebrow">Quizzes for placements, exams &amp; interviews</span>
+            <h1>Answer against the clock. <em>Learn from every mistake.</em></h1>
+            <p class="lede">
+                Timed multiple-choice quizzes on Java, C++, SQL, data structures, aptitude and more.
+                When you get one wrong, you see exactly what the right answer was and why.
+            </p>
+            <div class="row">
+                <a class="btn accent big" th:href="@{/signup}">Create a free account</a>
+                <a class="btn ghost big" th:href="@{/signin}">I already have one</a>
+            </div>
+        </div>
+
+        <div class="specimen" aria-hidden="true">
+            <span class="q-num">QUESTION 04 OF 08</span>
+            <p class="q-prompt">Which collection does not allow duplicate elements?</p>
+            <ul class="choices">
+                <li class="choice"><span class="bubble">A</span>ArrayList</li>
+                <li class="choice is-wrong"><span class="bubble">B</span>LinkedList<span class="note">your pick</span></li>
+                <li class="choice is-right"><span class="bubble">C</span>HashSet<span class="note">correct</span></li>
+                <li class="choice"><span class="bubble">D</span>Vector</li>
+            </ul>
+            <p class="q-why">A Set stores each element at most once, so adding a duplicate does nothing.</p>
+        </div>
+    </section>
+
+    <section class="stats" aria-label="Portal in numbers">
+        <div class="stat"><div class="stat-label">Live quizzes</div><div class="stat-value" th:text="${quizTotal}">0</div></div>
+        <div class="stat"><div class="stat-label">Questions</div><div class="stat-value" th:text="${questionTotal}">0</div></div>
+        <div class="stat"><div class="stat-label">Topics</div><div class="stat-value" th:text="${#lists.size(topics)}">0</div></div>
+        <div class="stat"><div class="stat-label">Cost</div><div class="stat-value">₹0</div></div>
+    </section>
+
+    <section class="landing-section" th:unless="${#lists.isEmpty(topics)}">
+        <span class="eyebrow">What you can practise</span>
+        <h2>Topics</h2>
+        <div class="chips mt">
+            <span class="chip" th:each="t : ${topics}" th:style="'--h:' + ${@ui.hue(t.topic)}">
+                <span th:text="${t.topic}">Topic</span>
+                <span class="faint mono" th:text="${t.quizzes}">1</span>
+            </span>
+        </div>
+    </section>
+
+    <section class="landing-section">
+        <span class="eyebrow">How it works</span>
+        <div class="steps mt">
+            <div class="step">
+                <h3>Pick a quiz</h3>
+                <p>Browse by topic or search. Each quiz shows how many questions it has and how long you get.</p>
+            </div>
+            <div class="step">
+                <h3>Beat the clock</h3>
+                <p>A timer runs from the moment you start. If you leave, the clock keeps going and your answers are kept.</p>
+            </div>
+            <div class="step">
+                <h3>Fix your mistakes</h3>
+                <p>Your score appears instantly. Each wrong answer comes with the correct choice and an explanation.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/shell :: footer}"></footer>
+</body>
+</html>

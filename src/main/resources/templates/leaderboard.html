@@ -4,28 +4,41 @@
 <body>
 <header th:replace="~{fragments/shell :: topbar}"></header>
 <main class="page stack">
-    <div>
+    <div class="page-head">
+        <span class="eyebrow">Rankings</span>
         <h1>Leaderboard</h1>
-        <p class="muted">Most correct answers across every quiz. Ties go to the higher average.</p>
+        <p class="muted">Ranked by correct answers across every quiz. Ties go to the higher average.</p>
     </div>
 
-    <section class="panel flush">
-        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(rows)}">No finished attempts yet.</p>
-        <div class="table-wrap" th:unless="${#lists.isEmpty(rows)}">
+    <div class="sheet empty" th:if="${#lists.isEmpty(rows)}">No finished attempts yet. Be the first on the board.</div>
+
+    <!-- podium: 2nd, 1st, 3rd -->
+    <section class="podium" th:if="${#lists.size(rows) >= 3}">
+        <div class="place" th:each="idx : ${ {1, 0, 2} }" th:with="r=${rows[idx]}" th:classappend="${idx == 0} ? 'first'">
+            <div class="medal" th:text="${idx == 0} ? '1ST PLACE' : (${idx == 1} ? '2ND PLACE' : '3RD PLACE')">PLACE</div>
+            <div class="avatar" th:text="${@ui.initials(r.name)}">AB</div>
+            <div class="name" th:text="${r.name}">Name</div>
+            <div class="pts" th:text="${r.correctAnswers} + ' correct · ' + ${r.roundedAverage()} + '% avg'">0</div>
+        </div>
+    </section>
+
+    <section class="sheet flush" th:unless="${#lists.isEmpty(rows)}">
+        <div class="table-wrap">
             <table>
-                <thead><tr><th>#</th><th>Student</th><th>Quizzes</th><th>Correct answers</th><th>Average</th></tr></thead>
+                <thead><tr><th>Rank</th><th>Student</th><th>Quizzes</th><th>Correct answers</th><th>Average</th></tr></thead>
                 <tbody>
                 <tr th:each="r, i : ${rows}">
-                    <td class="rank" th:classappend="${i.count <= 3} ? 'top'" th:text="${i.count}">1</td>
-                    <td th:text="${r.name}"></td>
-                    <td th:text="${r.quizzesTaken}"></td>
-                    <td th:text="${r.correctAnswers}"></td>
-                    <td th:text="${r.roundedAverage()} + '%'"></td>
+                    <td class="rank" th:text="${#numbers.formatInteger(i.count, 2)}">01</td>
+                    <td><span class="person"><span class="avatar" th:text="${@ui.initials(r.name)}">AB</span><strong th:text="${r.name}"></strong></span></td>
+                    <td class="score" th:text="${r.quizzesTaken}"></td>
+                    <td class="score" th:text="${r.correctAnswers}"></td>
+                    <td><span class="tag" th:classappend="${r.roundedAverage() >= 60} ? 'good'" th:text="${r.roundedAverage()} + '%'"></span></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>

@@ -6,39 +6,45 @@
 <main class="page stack">
     <th:block th:replace="~{fragments/shell :: flash}"></th:block>
 
-    <div class="spread">
-        <div>
-            <a class="small" th:href="@{/admin/quizzes}">← All quizzes</a>
-            <h1><span th:text="${quiz.title}">Quiz</span>
-                <span class="tag" th:classappend="${quiz.live} ? 'live'" th:text="${quiz.live} ? 'Live' : 'Draft'"></span></h1>
-            <p class="muted small" th:text="${quiz.topic} + ' · ' + ${quiz.timeLimitMinutes} + ' min · pass at '
-                + ${quiz.passMark} + '% · ' + ${#lists.size(quiz.questions)} + ' questions'"></p>
-            <p th:if="${quiz.description}" th:text="${quiz.description}"></p>
-        </div>
-        <div class="row">
-            <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/toggle-live(id=${quiz.id})}">
-                <button class="btn" type="submit" th:text="${quiz.live} ? 'Move to drafts' : 'Publish'">Publish</button>
-            </form>
-            <a class="btn ghost" th:href="@{/admin/quizzes/{id}/settings(id=${quiz.id})}">Settings</a>
-            <a class="btn ghost" th:href="@{/admin/quizzes/{id}/scores(id=${quiz.id})}">Scores</a>
-            <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/delete(id=${quiz.id})}"
-                  onsubmit="return confirm('Delete this quiz along with its questions and every attempt?')">
-                <button class="btn danger" type="submit">Delete</button>
-            </form>
+    <div>
+        <a class="back" th:href="@{/admin/quizzes}">← All quizzes</a>
+        <div class="spread page-head">
+            <div>
+                <div class="row">
+                    <span class="chip" th:style="'--h:' + ${@ui.hue(quiz.topic)}" th:text="${quiz.topic}">Topic</span>
+                    <span class="tag" th:classappend="${quiz.live} ? 'live'" th:text="${quiz.live} ? 'Live' : 'Draft'"></span>
+                </div>
+                <h1 class="mt" th:text="${quiz.title}">Quiz</h1>
+                <p class="muted mono small" th:text="${#lists.size(quiz.questions)} + ' questions · ' + ${quiz.timeLimitMinutes} + ' min · pass at ' + ${quiz.passMark} + '%'"></p>
+                <p class="muted" th:if="${quiz.description}" th:text="${quiz.description}"></p>
+            </div>
+            <div class="row">
+                <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/toggle-live(id=${quiz.id})}">
+                    <button class="btn" th:classappend="${quiz.live} ? 'ghost' : 'accent'" type="submit"
+                            th:text="${quiz.live} ? 'Move to drafts' : 'Publish'">Publish</button>
+                </form>
+                <a class="btn ghost" th:href="@{/admin/quizzes/{id}/settings(id=${quiz.id})}">Settings</a>
+                <a class="btn ghost" th:href="@{/admin/quizzes/{id}/scores(id=${quiz.id})}">Scores</a>
+                <form class="inline" method="post" th:action="@{/admin/quizzes/{id}/delete(id=${quiz.id})}"
+                      onsubmit="return confirm('Delete this quiz along with its questions and every attempt?')">
+                    <button class="btn danger" type="submit">Delete</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <section class="panel flush">
-        <div class="panel-title spread" style="align-items:center">
-            <span>Questions</span>
-            <a class="btn small" th:href="@{/admin/quizzes/{id}/questions/create(id=${quiz.id})}">+ Add question</a>
+    <section class="sheet flush">
+        <div class="sheet-head">
+            <h2>Questions</h2>
+            <a class="btn small accent" th:href="@{/admin/quizzes/{id}/questions/create(id=${quiz.id})}">+ Add question</a>
         </div>
-        <p class="muted" style="padding:1rem 1.25rem;margin:0" th:if="${#lists.isEmpty(quiz.questions)}">
-            No questions yet. Add one to be able to publish.
-        </p>
-        <div class="question" th:each="q, i : ${quiz.questions}">
-            <div class="question-head">
-                <div><span class="question-num" th:text="${i.count} + '.'"></span><span th:text="${q.prompt}"></span></div>
+        <div class="empty" th:if="${#lists.isEmpty(quiz.questions)}">No questions yet. Add one to be able to publish.</div>
+        <article class="q" th:each="q, i : ${quiz.questions}">
+            <div class="q-head">
+                <div>
+                    <span class="q-num" th:text="'QUESTION ' + ${#numbers.formatInteger(i.count, 2)}">QUESTION 01</span>
+                    <div class="q-prompt" th:text="${q.prompt}">Prompt</div>
+                </div>
                 <div class="nowrap">
                     <a class="btn ghost small" th:href="@{/admin/questions/{id}(id=${q.id})}">Edit</a>
                     <form class="inline" method="post" th:action="@{/admin/questions/{id}/delete(id=${q.id})}"
@@ -48,13 +54,17 @@
                 </div>
             </div>
             <ul class="choices">
-                <li th:each="c, ci : ${q.choices}" th:classappend="${ci.index == q.answerIndex} ? 'right-answer'">
-                    <span th:text="${c}"></span><strong th:if="${ci.index == q.answerIndex}"> ✓</strong>
+                <li class="choice" th:each="c, ci : ${q.choices}" th:classappend="${ci.index == q.answerIndex} ? 'is-right'">
+                    <span class="bubble" th:text="${@ui.letter(ci.index)}">A</span>
+                    <span th:text="${c}">Choice</span>
+                    <span class="note" th:if="${ci.index == q.answerIndex}">correct</span>
                 </li>
             </ul>
-            <p class="why" th:if="${q.explanation}" th:text="${q.explanation}"></p>
-        </div>
+            <p class="q-why" th:if="${q.explanation}" th:text="${q.explanation}"></p>
+            <p class="q-why faint" th:unless="${q.explanation}">No explanation yet. Students who get this wrong will only see the correct answer.</p>
+        </article>
     </section>
 </main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
 </body>
 </html>
