@@ -42,6 +42,19 @@ public class AccountService implements UserDetailsService {
         }
     }
 
+    /**
+     * Changes an account's password after checking the current one.
+     * Throws {@link WrongPasswordException} if the current password doesn't match.
+     */
+    @Transactional
+    public void changePassword(Long accountId, String currentPassword, String newPassword) {
+        Account account = accounts.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("Account"));
+        if (!encoder.matches(currentPassword, account.getPasswordHash())) {
+            throw new WrongPasswordException();
+        }
+        account.replacePasswordHash(encoder.encode(newPassword));
+    }
+
     public Account require(String email) {
         return accounts.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account"));
@@ -63,6 +76,12 @@ public class AccountService implements UserDetailsService {
 
     private static String normalize(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    public static class WrongPasswordException extends RuntimeException {
+        public WrongPasswordException() {
+            super("Your current password is incorrect.");
+        }
     }
 
     public static class EmailTakenException extends RuntimeException {

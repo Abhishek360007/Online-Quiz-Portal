@@ -78,6 +78,8 @@ h2 { font-size: 1.15rem; }
 .nav a:hover { color: #fff; }
 .who { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: #cbd2e1; }
 .who form { margin: 0; }
+.who .nav-link-quiet { color: #cbd2e1; text-decoration: none; }
+.who .nav-link-quiet:hover { color: #fff; text-decoration: underline; }
 
 /* ---------- surfaces ---------- */
 .panel {

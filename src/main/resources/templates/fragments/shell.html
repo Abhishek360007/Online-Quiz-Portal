@@ -27,6 +27,7 @@
         <div class="who" th:if="${me != null}">
             <span th:text="${me.displayName}">Name</span>
             <span class="tag" th:text="${me.admin} ? 'Admin' : 'Student'">Role</span>
+            <a class="nav-link-quiet" th:href="@{/account/password}">Change password</a>
             <form th:action="@{/signout}" method="post">
                 <button class="btn light small" type="submit">Sign out</button>
             </form>

@@ -43,6 +43,10 @@ public class Account {
         return role == Role.ADMIN;
     }
 
+    public void replacePasswordHash(String newHash) {
+        this.passwordHash = newHash;
+    }
+
     public Long getId() { return id; }
     public String getDisplayName() { return displayName; }
     public String getEmail() { return email; }
