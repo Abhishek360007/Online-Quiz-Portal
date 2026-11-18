@@ -5,7 +5,9 @@ import com.abhishek.quizportal.domain.Attempt;
 import com.abhishek.quizportal.domain.Question;
 import com.abhishek.quizportal.domain.Quiz;
 import com.abhishek.quizportal.web.view.RankRow;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +17,16 @@ import java.util.Optional;
 public interface AttemptRepository extends JpaRepository<Attempt, Long> {
 
     Optional<Attempt> findFirstByStudentAndQuizAndFinishedAtIsNullOrderByBeganAtDesc(Account student, Quiz quiz);
+
+    /**
+     * The attempt with a row lock ({@code SELECT ... FOR UPDATE}) until the transaction ends.
+     * Used when submitting, so two submissions of one attempt (a double click, two tabs, the
+     * timer's auto-submit racing the button) are graded one after the other: the second
+     * finds it already finished instead of grading it again.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from Attempt a where a.id = :id")
+    Optional<Attempt> findByIdForUpdate(@Param("id") Long id);
 
     List<Attempt> findByStudentAndFinishedAtIsNotNullOrderByFinishedAtDesc(Account student);
 
