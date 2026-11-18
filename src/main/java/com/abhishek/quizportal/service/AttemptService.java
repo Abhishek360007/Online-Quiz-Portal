@@ -47,7 +47,13 @@ public class AttemptService {
 
     @Transactional
     public Attempt finish(Account student, Long attemptId, Map<Long, Integer> choices) {
-        Attempt attempt = owned(student, attemptId);
+        // Lock the row: a concurrent submission waits here, then sees the attempt finished
+        // (Attempt.finish ignores a finished attempt) instead of grading it a second time.
+        Attempt attempt = attempts.findByIdForUpdate(attemptId)
+                .orElseThrow(() -> new ResourceNotFoundException("Attempt"));
+        if (!attempt.getStudent().getId().equals(student.getId())) {
+            throw new AccessDeniedException("This attempt belongs to someone else.");
+        }
         attempt.finish(choices, now());
         return attempt;
     }
