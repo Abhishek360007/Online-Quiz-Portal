@@ -32,10 +32,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Two submissions of the same attempt at the same moment (a double click, two tabs, the
  * timer's auto-submit racing the button) must grade it once. Not @Transactional like the
- * other tests: each thread needs its own real transaction, so this class commits data and
- * then discards its Spring context (and the in-memory database) when it's done.
+ * other tests: each thread needs its own real transaction, so this class commits data. It
+ * therefore uses its own in-memory database (the other tests share "portal"; dropping that
+ * one when this context closes would empty it under them) and discards its context after.
  */
-@SpringBootTest
+@SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:concurrent-submit;MODE=PostgreSQL;DB_CLOSE_DELAY=-1")
 @Import(PortalTestBase.TestClockConfig.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ConcurrentSubmitTest {
